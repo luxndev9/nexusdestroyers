@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FreeVault - ¡Nos vemos pronto!</title>
+  <style>
+    /* Reset y estilos básicos */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #000; /* Fondo negro */
+      color: #0f0;      /* Texto verde, estilo consola */
+      font-family: Consolas, "Courier New", monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      border: 2px solid #0f0;
+      padding: 20px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.85);
+    }
+    /* ASCII Art */
+    .ascii-art {
+      font-size: 1rem;
+      line-height: 1.2;
+      color: rgb(255, 0, 0);
+      margin-bottom: 20px;
+      white-space: pre;
+    }
+    /* Título y subtítulos */
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: #ff0000;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    /* Información del sistema simulada */
+    .system-info {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: left;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    /* Mensaje final */
+    .final-text {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+    /* Botón de Discord */
+    .btn-discord {
+      display: inline-block;
+      text-decoration: none;
+      background: #333;
+      color: #0f0;
+      border: 2px solid #0f0;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-discord:hover {
+      background: rgb(255, 68, 0);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ASCII Art -->
+    <div class="ascii-art" id="asciiArt">
+      <!-- Puedes personalizar el siguiente ASCII art -->
+
+
+
+      ▒▒▒▒▒▒▒▒▒▒▒▄▄▄▄░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒▒▒▒▒▒▄██████▒▒▒▒▒▄▄▄█▄▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒▒▒▒▄██▀░░▀██▄▒▒▒▒████████▄▒▒▒▒▒▒
+      ▒▒▒▒▒▒███░░░░░░██▒▒▒▒▒▒█▀▀▀▀▀██▄▄▒▒▒
+      ▒▒▒▒▒▄██▌░░░░░░░██▒▒▒▒▐▌▒▒▒▒▒▒▒▒▀█▄▒
+      ▒▒▒▒▒███░░▐█░█▌░██▒▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▀▌
+      ▒▒▒▒████░▐█▌░▐█▌██▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▐████░▐░░░░░▌██▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒████░░░▄█░░░██▒▒▐█▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒████░░░██░░██▌▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒████▌░▐█░░███▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒▐████░░▌░███▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒▒▒████░░░███▒▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▒▒██████▌░████▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒▐████████████▒▒███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ▒█████████████▄████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ██████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ██████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      █████████████████▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      █████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+      ████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    </div>
+
+    <h1>¡NOS VEMOS PRONTO!</h1>
+    <p class="subtitle">
+      El servidor <span style="color:#ff2e2e;">Nexus Destroyers</span> está en construcción.<br>
+      Nuestro developer Luxn está trabajando arduamente para darle vida a esta web.
+    </p>
+
+    <div class="system-info">
+      <p><strong>System:</strong> Cargando...</p>
+      <p><strong>Progress:</strong> 35% - Creando interfaces dinámicas.</p>
+      <p><strong>Loading:</strong> Recursos de alto rendimiento...</p>
+      <p><strong>Mission:</strong> Llevar Nexus a nuevas alturas. 🚀</p>
+    </div>
+
+    <p class="final-text">
+      ¡Vuelve pronto para ver el resultado final!<br>
+      <em>¡Te sorprenderá!</em>
+    </p>
+
+    <a href="https://discord.gg/tuservidor" class="btn-discord">Únete a nuestro Discord</a>
+  </div>
+
+  <script>
+    // Ejemplo de animación de "typing" en la primera línea de system-info
+    window.addEventListener("load", () => {
+      const infoParagraph = document.querySelector(".system-info p:first-child");
+      const fullText = "System: Nexus OS v1.0 (Cargando...)";
+      infoParagraph.textContent = "";
+      let i = 0;
+      const interval = setInterval(() => {
+        infoParagraph.textContent += fullText.charAt(i);
+        i++;
+        if(i >= fullText.length) {
+          clearInterval(interval);
+        }
+      }, 100);
+    });
+  </script>
+</body>
+</html>
