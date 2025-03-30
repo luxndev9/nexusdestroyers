@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FreeVault - ¡Nos vemos pronto!</title>
   <style>
-    /* Reset y estilos básicos */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      background: #000; /* Fondo negro */
-      color: #0f0;      /* Texto verde, estilo consola */
-      font-family: Consolas, "Courier New", monospace;
+      background-color: #1a1a1a;
+      color: #32CD32;
+      font-family: "Courier New", Courier, monospace;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -22,14 +21,13 @@
       text-align: center;
       padding: 20px;
     }
-    .container {
+    .content-wrapper {
       max-width: 700px;
-      border: 2px solid #0f0;
+      border: 2px solid #32CD32;
       padding: 20px;
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.85);
     }
-    /* ASCII Art */
     .ascii-art {
       font-size: 1rem;
       line-height: 1.2;
@@ -37,9 +35,8 @@
       margin-bottom: 20px;
       white-space: pre;
     }
-    /* Título y subtítulos */
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       margin-bottom: 10px;
       color: #ff0000;
       text-transform: uppercase;
@@ -47,97 +44,74 @@
     .subtitle {
       margin-bottom: 20px;
       line-height: 1.5;
+      font-size: 1.1rem;
     }
-    /* Información del sistema simulada */
-    .system-info {
+    .system-info-box {
       background: rgba(255, 255, 255, 0.05);
       padding: 10px;
       margin-bottom: 20px;
       text-align: left;
       border-radius: 4px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
-    /* Mensaje final */
-    .final-text {
+    .final-message {
       margin-bottom: 20px;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
-    /* Botón de Discord */
-    .btn-discord {
+    .discord-button {
       display: inline-block;
       text-decoration: none;
-      background: #333;
-      color: #0f0;
-      border: 2px solid #0f0;
+      background: #222;
+      color: #32CD32;
+      border: 2px solid #32CD32;
       padding: 10px 20px;
       border-radius: 4px;
       font-weight: bold;
       transition: background 0.3s, color 0.3s;
     }
-    .btn-discord:hover {
-      background: rgb(255, 68, 0);
+    .discord-button:hover {
+      background: #ff4400;
       color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- ASCII Art -->
+  <div class="content-wrapper">
     <div class="ascii-art" id="asciiArt">
-      <!-- Puedes personalizar el siguiente ASCII art -->
-
-
-
       ▒▒▒▒▒▒▒▒▒▒▒▄▄▄▄░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
       ▒▒▒▒▒▒▒▒▒▄██████▒▒▒▒▒▄▄▄█▄▒▒▒▒▒▒▒▒▒▒
       ▒▒▒▒▒▒▒▄██▀░░▀██▄▒▒▒▒████████▄▒▒▒▒▒▒
-      ▒▒▒▒▒▒███░░░░░░██▒▒▒▒▒▒█▀▀▀▀▀██▄▄▒▒▒
+      ▒▒▒▒▒▒▒███░░░░░░██▒▒▒▒▒▒█▀▀▀▀▀██▄▄▒▒▒
       ▒▒▒▒▒▄██▌░░░░░░░██▒▒▒▒▐▌▒▒▒▒▒▒▒▒▀█▄▒
       ▒▒▒▒▒███░░▐█░█▌░██▒▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▀▌
       ▒▒▒▒████░▐█▌░▐█▌██▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▐████░▐░░░░░▌██▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▒████░░░▄█░░░██▒▒▐█▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▒████░░░██░░██▌▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▒████▌░▐█░░███▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▒▐████░░▌░███▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒▒▒████░░░███▒▒▒▒█▌▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▒▒██████▌░████▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒▐████████████▒▒███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ▒█████████████▄████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ██████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ██████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      █████████████████▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      █████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      ████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     </div>
 
     <h1>¡NOS VEMOS PRONTO!</h1>
     <p class="subtitle">
       El servidor <span style="color:#ff2e2e;">Nexus Destroyers</span> está en construcción.<br>
-      Nuestro developer Luxn está trabajando arduamente para darle vida a esta web.
+      Nuestro developer Luxn está trabajando para brindarte lo mejor de la web.
     </p>
 
-    <div class="system-info">
-      <p><strong>System:</strong> Cargando...</p>
-      <p><strong>Progress:</strong> 35% - Creando interfaces dinámicas.</p>
-      <p><strong>Loading:</strong> Recursos de alto rendimiento...</p>
-      <p><strong>Mission:</strong> Llevar Nexus a nuevas alturas. 🚀</p>
+    <div class="system-info-box">
+      <p><strong>Sistema:</strong> Cargando...</p>
+      <p><strong>Progreso:</strong> 35% - Creando interfaces interactivas.</p>
+      <p><strong>Cargando:</strong> Recursos avanzados...</p>
+      <p><strong>Misión:</strong> Impulsar Nexus a nuevas alturas. 🚀</p>
     </div>
 
-    <p class="final-text">
-      ¡Vuelve pronto para ver el resultado final!<br>
+    <p class="final-message">
+      ¡Vuelve pronto para ver la versión final!<br>
       <em>¡Te sorprenderá!</em>
     </p>
 
-    <a href="https://discord.gg/PU2UARzqRC" class="btn-discord">Únete a nuestro Discord</a>
+    <a href="https://discord.gg/PU2UARzqRC" class="discord-button">Únete a nuestro Discord</a>
   </div>
 
   <script>
-    // Ejemplo de animación de "typing" en la primera línea de system-info
     window.addEventListener("load", () => {
-      const infoParagraph = document.querySelector(".system-info p:first-child");
-      const fullText = "System: Nexus OS v1.0 (Cargando...)";
+      const infoParagraph = document.querySelector(".system-info-box p:first-child");
+      const fullText = "Sistema: Nexus OS v1.0 (Cargando...)";
       infoParagraph.textContent = "";
       let i = 0;
       const interval = setInterval(() => {
@@ -151,3 +125,4 @@
   </script>
 </body>
 </html>
+
