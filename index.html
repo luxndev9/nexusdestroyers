@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>SK SQUAD Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00ff00;
+      font-family: monospace;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .center {
+      text-align: center;
+      white-space: pre;
+    }
+
+    .ascii {
+      color: red;
+      font-size: 14px;
+    }
+
+    #terminal {
+      margin-top: 30px;
+    }
+
+    #output {
+      margin-bottom: 10px;
+    }
+
+    #prompt-line {
+      display: flex;
+    }
+
+    #prompt {
+      color: #00ff00;
+    }
+
+    input {
+      background: black;
+      border: none;
+      color: #00ff00;
+      font-family: monospace;
+      font-size: 16px;
+      outline: none;
+      flex-grow: 1;
+    }
+
+    ::selection {
+      background: #00ff00;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="center ascii">
+.d8888b.  888    d8P       .d8888b.   .d88888b.  888     888       d8888 8888888b. 
+d88P  Y88b 888   d8P       d88P  Y88b d88P" "Y88b 888     888      d88888 888  "Y88b
+Y88b.      888  d8P        Y88b.      888     888 888     888     d88P888 888    888
+ "Y888b.   888d88K          "Y888b.   888     888 888     888    d88P 888 888    888
+    "Y88b. 8888888b            "Y88b. 888     888 888     888   d88P  888 888    888
+      "888 888  Y88b             "888 888 Y8b 888 888     888  d88P   888 888    888
+Y88b  d88P 888   Y88b      Y88b  d88P Y88b.Y8b88P Y88b. .d88P d8888888888 888  .d88P
+ "Y8888P"  888    Y88b      "Y8888P"   "Y888888"   "Y88888P" d88P     888 8888888P" 
+                                             Y8b                                    
+  </div>
+
+  <div class="center ascii">
+    __           __       __  __    __   ______   ______   ______  
+  _/  |_        /  |  _  /  |/  |  /  | /      \ /      | /      \ 
+ / $$   \       $$ | / \ $$ |$$ |  $$ |/$$$$$$  |$$$$$$/ /$$$$$$  |
+/$$$$$$  |      $$ |/$  \$$ |$$ |__$$ |$$ |  $$ |  $$ |  $$ \__$$/ 
+$$ \__$$/       $$ /$$$  $$ |$$    $$ |$$ |  $$ |  $$ |  $$      \ 
+$$      \       $$ $$/$$ $$ |$$$$$$$$ |$$ |  $$ |  $$ |   $$$$$$  |
+ $$$$$$  |      $$$$/  $$$$ |$$ |  $$ |$$ \__$$ | _$$ |_ /  \__$$ |
+/  \__$$ |      $$$/    $$$ |$$ |  $$ |$$    $$/ / $$   |$$    $$/ 
+$$    $$/       $$/      $$/ $$/   $$/  $$$$$$/  $$$$$$/  $$$$$$/  
+ $$$$$$/                                                           
+   $$/                                                                 
+  </div>
+
+  <div class="center" style="margin-top: 30px;">
+    Escribe <span style="color:red">cd whois-</span> para usar el módulo de IPs
+  </div>
+
+  <div id="terminal">
+    <div id="output"></div>
+    <div id="prompt-line">
+      <span id="prompt">root@sksquad:~$&nbsp;</span>
+      <input type="text" id="input" autofocus />
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+
+    let inWhoisMode = false;
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim();
+        output.innerHTML += `<div><span id="prompt">root@sksquad:~$ </span>${cmd}</div>`;
+        handleCommand(cmd.toLowerCase());
+        input.value = "";
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    });
+
+    async function handleCommand(cmd) {
+      if (cmd === "cd whois-") {
+        inWhoisMode = true;
+        output.innerHTML += `<div>Modo WHOIS activado. Usa: whois [ip]</div>`;
+      } else if (inWhoisMode && cmd.startsWith("whois ")) {
+        const ip = cmd.split(" ")[1];
+        output.innerHTML += `<div>🔍 Buscando información de ${ip}...</div>`;
+        try {
+          const res = await fetch(`https://ipapi.co/${ip}/json/`);
+          const data = await res.json();
+
+          if (data.error) {
+            output.innerHTML += `<div>❌ Error: ${data.reason || 'IP no válida o no encontrada'}</div>`;
+          } else {
+            output.innerHTML += `
+              <div>📡 Whois de ${ip}</div>
+              <div>IP: ${data.ip}</div>
+              <div>ISP: ${data.org || 'Desconocido'}</div>
+              <div>Ubicación: ${data.city || '-'}, ${data.region || '-'}, ${data.country_name || '-'}</div>
+              <div>Org: ${data.org || '-'}</div>
+              <div>Continent: ${data.continent_name || '-'}</div>
+              <div>Estado: Datos en vivo ✅</div>
+            `;
+          }
+        } catch (err) {
+          output.innerHTML += `<div>❌ Error al conectar con el servicio WHOIS</div>`;
+        }
+      } else if (cmd === "clear") {
+        output.innerHTML = "";
+      } else if (cmd === "help") {
+        output.innerHTML += `<div>Comandos disponibles: cd whois-, whois [ip], clear, help</div>`;
+      } else {
+        output.innerHTML += `<div>Comando no reconocido. Usa 'help' para ver opciones.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
