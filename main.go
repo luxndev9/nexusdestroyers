@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -14,127 +13,104 @@ import (
 	"time"
 )
 
-// Esto mete el HTML dentro del ejecutable automáticamente
-//go:embed templates/index.html
-var templateFolder embed.FS
-
-// Estructuras de datos
-type PageData struct {
-	Username string
-	Avatar   string
-}
-
-type ActionRequest struct {
-	Action string   `json:"action"`
-	Tokens []string `json:"tokens"`
-	Value  string   `json:"value"`
-}
+// AQUÍ ESTÁ TU WEB INCRUSTADA
+const htmlIndex = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FringeShop PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#36393f] text-white p-10 font-sans">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🛸 Nexus Destroyers Dashboard</h1>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <textarea id="tokens" placeholder="Tokens aquí..." class="bg-[#202225] p-4 rounded h-40 outline-none"></textarea>
+            <textarea id="proxies" placeholder="Proxies (opcional)..." class="bg-[#202225] p-4 rounded h-40 outline-none"></textarea>
+        </div>
+        <div class="flex gap-4 mb-6">
+            <input type="text" id="val" class="bg-[#202225] p-2 rounded flex-grow" placeholder="BIO / Nombre">
+            <button onclick="run('bio')" class="bg-indigo-500 px-6 py-2 rounded font-bold">Cambiar BIO</button>
+            <button onclick="run('check')" class="bg-gray-600 px-6 py-2 rounded font-bold">Check Status</button>
+        </div>
+        <div id="logs" class="bg-black p-4 rounded h-40 overflow-y-auto font-mono text-xs text-green-400">
+            [SYSTEM] Esperando tokens...
+        </div>
+    </div>
+    <script>
+        async function run(type) {
+            const tokens = document.getElementById('tokens').value.split('\n').filter(t => t.trim() !== "");
+            const val = document.getElementById('val').value;
+            const logBox = document.getElementById('logs');
+            logBox.innerHTML += "<br>> Ejecutando " + type + "...";
+            
+            const res = await fetch('/api/action', {
+                method: 'POST',
+                body: JSON.stringify({ action: type, tokens: tokens, value: val })
+            });
+            const text = await res.text();
+            logBox.innerHTML += "<br>> " + text;
+        }
+    </script>
+</body>
+</html>
+`
 
 func main() {
-	// 1. Puerto dinámico para la nube
 	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	if port == "" { port = "8080" }
 
-	// 2. Rutas del Servidor
-	http.HandleFunc("/", handleHome)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		t, _ := template.New("index").Parse(htmlIndex)
+		t.Execute(w, nil)
+	})
+
 	http.HandleFunc("/api/action", handleAction)
 
-	// 3. Goroutine para el Bot (Trabajador 24/7)
-	go func() {
-		for {
-			// Aquí podrías poner un checker automático cada hora
-			time.Sleep(1 * time.Hour)
-		}
-	}()
-
-	// 4. Inicio del servidor en 0.0.0.0
-	fmt.Printf("🚀 FringeShop Online en el puerto %s\n", port)
-	serverAddr := "0.0.0.0:" + port
-	err := http.ListenAndServe(serverAddr, nil)
-	if err != nil {
-		log.Fatal("❌ Error al encender: ", err)
-	}
+	fmt.Printf("🚀 App prendida en 0.0.0.0:%s\n", port)
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
 }
 
-// Renderiza la web usando el archivo embebido
-func handleHome(w http.ResponseWriter, r *http.Request) {
-	data := PageData{
-		Username: "FringeUser_Pro",
-		Avatar:   "https://cdn.discordapp.com/embed/avatars/1.png",
-	}
-
-	// Cargamos el template desde la memoria (embed)
-	tmpl, err := template.ParseFS(templateFolder, "templates/index.html")
-	if err != nil {
-		http.Error(w, "Error interno: "+err.Error(), 500)
-		return
-	}
-	tmpl.Execute(w, data)
-}
-
-// Maneja los clics de los botones de la web
 func handleAction(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Solo POST", 405)
-		return
+	var req struct {
+		Action string   `json:"action"`
+		Tokens []string `json:"tokens"`
+		Value  string   `json:"value"`
 	}
-
-	var req ActionRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		fmt.Fprintf(w, "Error en los datos enviados")
-		return
-	}
+	json.NewDecoder(r.Body).Decode(&req)
 
 	var wg sync.WaitGroup
-	successCount := 0
+	success := 0
 	var mu sync.Mutex
 
-	// Procesar cada token de forma independiente y rápida
-	for _, token := range req.Tokens {
-		t := strings.TrimSpace(token)
-		if t == "" { continue }
-
+	for _, t := range req.Tokens {
 		wg.Add(1)
 		go func(tk string) {
 			defer wg.Done()
-
-			// Configuración de la petición a Discord
-			apiUrl := "https://discord.com/api/v9/users/@me/profile"
+			url := "https://discord.com/api/v9/users/@me/profile"
 			method := "PATCH"
 			var body []byte
-
-			switch req.Action {
-			case "bio":
-				payload := map[string]string{"bio": req.Value}
-				body, _ = json.Marshal(payload)
-			case "check":
+			if req.Action == "bio" {
+				body, _ = json.Marshal(map[string]string{"bio": req.Value})
+			} else {
 				method = "GET"
-				apiUrl = "https://discord.com/api/v9/users/@me"
-				body = nil
+				url = "https://discord.com/api/v9/users/@me"
 			}
 
-			dReq, _ := http.NewRequest(method, apiUrl, bytes.NewBuffer(body))
-			dReq.Header.Set("Authorization", tk)
-			dReq.Header.Set("Content-Type", "application/json")
-			dReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+			request, _ := http.NewRequest(method, url, bytes.NewBuffer(body))
+			request.Header.Set("Authorization", strings.TrimSpace(tk))
+			request.Header.Set("Content-Type", "application/json")
+			request.Header.Set("User-Agent", "Mozilla/5.0")
 
-			// Cliente con timeout para que no se quede trabado
-			client := &http.Client{Timeout: 8 * time.Second}
-			resp, err := client.Do(dReq)
-			
-			if err == nil {
-				if resp.StatusCode == 200 || resp.StatusCode == 204 {
-					mu.Lock()
-					successCount++
-					mu.Unlock()
-				}
-				resp.Body.Close()
+			client := &http.Client{Timeout: 5 * time.Second}
+			resp, err := client.Do(request)
+			if err == nil && (resp.StatusCode == 200 || resp.StatusCode == 204) {
+				mu.Lock()
+				success++
+				mu.Unlock()
 			}
 		}(t)
 	}
-
 	wg.Wait()
-	fmt.Fprintf(w, "✅ [%s] Acción terminada. Éxitos: %d de %d", strings.ToUpper(req.Action), successCount, len(req.Tokens))
+	fmt.Fprintf(w, "Completado: %d éxitos.", success)
 }
