@@ -13,14 +13,10 @@ import (
 	"time"
 )
 
-// AQUÍ ESTÁ TU WEB INCRUSTADA
 const htmlIndex = `
 <!DOCTYPE html>
 <html>
-<head>
-    <title>FringeShop PRO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<head><title>FringeShop PRO</title><script src="https://cdn.tailwindcss.com"></script></head>
 <body class="bg-[#36393f] text-white p-10 font-sans">
     <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl font-bold mb-6">🛸 Nexus Destroyers Dashboard</h1>
@@ -43,11 +39,7 @@ const htmlIndex = `
             const val = document.getElementById('val').value;
             const logBox = document.getElementById('logs');
             logBox.innerHTML += "<br>> Ejecutando " + type + "...";
-            
-            const res = await fetch('/api/action', {
-                method: 'POST',
-                body: JSON.stringify({ action: type, tokens: tokens, value: val })
-            });
+            const res = await fetch('/api/action', { method: 'POST', body: JSON.stringify({ action: type, tokens: tokens, value: val }) });
             const text = await res.text();
             logBox.innerHTML += "<br>> " + text;
         }
@@ -96,18 +88,19 @@ func handleAction(w http.ResponseWriter, r *http.Request) {
 				method = "GET"
 				url = "https://discord.com/api/v9/users/@me"
 			}
-
 			request, _ := http.NewRequest(method, url, bytes.NewBuffer(body))
 			request.Header.Set("Authorization", strings.TrimSpace(tk))
 			request.Header.Set("Content-Type", "application/json")
 			request.Header.Set("User-Agent", "Mozilla/5.0")
-
 			client := &http.Client{Timeout: 5 * time.Second}
-			resp, err := client.Do(request)
-			if err == nil && (resp.StatusCode == 200 || resp.StatusCode == 204) {
-				mu.Lock()
-				success++
-				mu.Unlock()
+			resp, _ := client.Do(request)
+			if resp != nil {
+				if resp.StatusCode == 200 || resp.StatusCode == 204 {
+					mu.Lock()
+					success++
+					mu.Unlock()
+				}
+				resp.Body.Close()
 			}
 		}(t)
 	}
