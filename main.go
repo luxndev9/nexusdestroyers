@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -13,7 +14,11 @@ import (
 	"time"
 )
 
-// Estructuras
+// Esto mete el HTML dentro del ejecutable automáticamente
+//go:embed templates/index.html
+var templateFolder embed.FS
+
+// Estructuras de datos
 type PageData struct {
 	Username string
 	Avatar   string
@@ -26,57 +31,59 @@ type ActionRequest struct {
 }
 
 func main() {
-	// 1. Configuracion de Red para Koyeb
+	// 1. Puerto dinámico para la nube
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	// 2. Trabajador en Segundo Plano (Bot 24/7)
+	// 2. Rutas del Servidor
+	http.HandleFunc("/", handleHome)
+	http.HandleFunc("/api/action", handleAction)
+
+	// 3. Goroutine para el Bot (Trabajador 24/7)
 	go func() {
 		for {
-			// Aquí puedes poner lógica de auto-check o lo que quieras
-			// fmt.Println("[BOT] Sistema activo en segundo plano...")
+			// Aquí podrías poner un checker automático cada hora
 			time.Sleep(1 * time.Hour)
 		}
 	}()
 
-	// 3. Rutas del Servidor Web
-	http.HandleFunc("/", handleHome)
-	http.HandleFunc("/api/action", handleAction)
-
-	// 4. Encendido (0.0.0.0 es clave para evitar el error de headers)
-	fmt.Printf("🌐 FringeShop Panel en http://0.0.0.0:%s\n", port)
-	err := http.ListenAndServe("0.0.0.0:"+port, nil)
+	// 4. Inicio del servidor en 0.0.0.0
+	fmt.Printf("🚀 FringeShop Online en el puerto %s\n", port)
+	serverAddr := "0.0.0.0:" + port
+	err := http.ListenAndServe(serverAddr, nil)
 	if err != nil {
-		log.Fatal("❌ Error al iniciar servidor: ", err)
+		log.Fatal("❌ Error al encender: ", err)
 	}
 }
 
+// Renderiza la web usando el archivo embebido
 func handleHome(w http.ResponseWriter, r *http.Request) {
 	data := PageData{
-		Username: "FringeUser", // Aquí irá el nombre de Discord después
-		Avatar:   "https://cdn.discordapp.com/embed/avatars/0.png",
+		Username: "FringeUser_Pro",
+		Avatar:   "https://cdn.discordapp.com/embed/avatars/1.png",
 	}
-	
-	tmpl, err := template.ParseFiles("templates/index.html")
+
+	// Cargamos el template desde la memoria (embed)
+	tmpl, err := template.ParseFS(templateFolder, "templates/index.html")
 	if err != nil {
-		http.Error(w, "Error cargando template: "+err.Error(), 500)
+		http.Error(w, "Error interno: "+err.Error(), 500)
 		return
 	}
 	tmpl.Execute(w, data)
 }
 
+// Maneja los clics de los botones de la web
 func handleAction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", 405)
+		http.Error(w, "Solo POST", 405)
 		return
 	}
 
 	var req ActionRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		fmt.Fprintf(w, "Error en datos")
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		fmt.Fprintf(w, "Error en los datos enviados")
 		return
 	}
 
@@ -84,6 +91,7 @@ func handleAction(w http.ResponseWriter, r *http.Request) {
 	successCount := 0
 	var mu sync.Mutex
 
+	// Procesar cada token de forma independiente y rápida
 	for _, token := range req.Tokens {
 		t := strings.TrimSpace(token)
 		if t == "" { continue }
@@ -92,15 +100,16 @@ func handleAction(w http.ResponseWriter, r *http.Request) {
 		go func(tk string) {
 			defer wg.Done()
 
-			// Lógica según la acción
+			// Configuración de la petición a Discord
 			apiUrl := "https://discord.com/api/v9/users/@me/profile"
 			method := "PATCH"
 			var body []byte
 
-			if req.Action == "bio" {
+			switch req.Action {
+			case "bio":
 				payload := map[string]string{"bio": req.Value}
 				body, _ = json.Marshal(payload)
-			} else if req.Action == "check" {
+			case "check":
 				method = "GET"
 				apiUrl = "https://discord.com/api/v9/users/@me"
 				body = nil
@@ -109,20 +118,23 @@ func handleAction(w http.ResponseWriter, r *http.Request) {
 			dReq, _ := http.NewRequest(method, apiUrl, bytes.NewBuffer(body))
 			dReq.Header.Set("Authorization", tk)
 			dReq.Header.Set("Content-Type", "application/json")
-			dReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+			dReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 
-			client := &http.Client{Timeout: 7 * time.Second}
+			// Cliente con timeout para que no se quede trabado
+			client := &http.Client{Timeout: 8 * time.Second}
 			resp, err := client.Do(dReq)
 			
-			if err == nil && (resp.StatusCode == 200 || resp.StatusCode == 204) {
-				mu.Lock()
-				successCount++
-				mu.Unlock()
+			if err == nil {
+				if resp.StatusCode == 200 || resp.StatusCode == 204 {
+					mu.Lock()
+					successCount++
+					mu.Unlock()
+				}
+				resp.Body.Close()
 			}
-			if resp != nil { resp.Body.Close() }
 		}(t)
 	}
 
 	wg.Wait()
-	fmt.Fprintf(w, "✅ Acción [%s] completada en %d cuentas.", req.Action, successCount)
+	fmt.Fprintf(w, "✅ [%s] Acción terminada. Éxitos: %d de %d", strings.ToUpper(req.Action), successCount, len(req.Tokens))
 }
