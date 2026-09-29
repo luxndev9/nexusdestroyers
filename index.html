@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borek — Automation Specialist &amp; OSINT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --card-bg: rgba(255, 255, 255, 0.025);
+      --card-bg-hover: rgba(255, 255, 255, 0.045);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --text: #ffffff;
+      --text-muted: #8e8e93;
+      --text-dim: #5c5c62;
+      --accent-green: #22c55e;
+      --accent-green-bg: rgba(34, 197, 94, 0.08);
+      --accent-green-border: rgba(34, 197, 94, 0.25);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.06);
+      --accent-red-border: rgba(239, 68, 68, 0.2);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem 1.5rem;
+    }
+
+    /* Minimal Top Navigation */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      margin-bottom: 3.5rem;
+    }
+
+    .nav-brand {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-brand span.dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Language Switcher Segmented Control */
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.35rem;
+      border-radius: 9999px;
+      backdrop-filter: blur(8px);
+      gap: 0.2rem;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0.22rem 0.55rem;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      transition: color 0.2s, background-color 0.2s;
+    }
+
+    .lang-btn:hover {
+      color: #ffffff;
+    }
+
+    .lang-btn.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Hero Section with Clean Hands Framing */
+    .hero {
+      text-align: center;
+      padding: 2rem 0 4rem 0;
+      position: relative;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-pill-badge {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Creation of Adam Hands Backdrop */
+    .hero-arms-stage {
+      position: relative;
+      width: 100vw;
+      left: 50%;
+      margin-left: -50vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      overflow: clip visible;
+    }
+
+    .hero-arm {
+      position: absolute;
+      top: 50%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      opacity: 0.92;
+      filter: contrast(1.05) brightness(0.95);
+    }
+
+    .hero-arm--digital {
+      left: 0;
+      height: clamp(100px, 14vw, 220px);
+      width: calc(-260px + 50vw);
+      min-width: 80px;
+      object-position: left center;
+      transform: translate(-15px, calc(-50% - 3px));
+      animation: armInLeft 1.6s var(--ease-out) 0.1s both;
+    }
+
+    .hero-arm--human {
+      right: -50px;
+      height: clamp(110px, 15vw, 240px);
+      width: auto;
+      max-width: calc(-200px + 50vw);
+      object-position: right center;
+      transform: translate(-50px, calc(-50% - 21px)) scale(1.1);
+      transform-origin: right center;
+      animation: armInRight 1.6s var(--ease-out) 0.1s both;
+    }
+
+    @keyframes armInLeft {
+      0% {
+        opacity: 0;
+        transform: translate(-100%, calc(-50% - 3px));
+      }
+      100% {
+        opacity: 0.92;
+        transform: translate(-15px, calc(-50% - 3px));
+      }
+    }
+
+    @keyframes armInRight {
+      0% {
+        opacity: 0;
+        transform: translate(100%, calc(-50% - 21px)) scale(1.1);
+      }
+      100% {
+        opacity: 0.92;
+        transform: translate(-50px, calc(-50% - 21px)) scale(1.1);
+      }
+    }
+
+    /* Glowing, Luminous Main Name with Typewriter Effect */
+    .hero-title-wrap {
+      position: relative;
+      z-index: 2;
+      min-height: 1.15em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 9.5vw, 6.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: #ffffff;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      animation: glowPulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 
+          0 0 14px rgba(255, 255, 255, 0.85),
+          0 0 32px rgba(255, 255, 255, 0.45),
+          0 0 65px rgba(0, 240, 255, 0.25),
+          0 0 90px rgba(0, 255, 157, 0.15);
+      }
+      50% {
+        text-shadow: 
+          0 0 24px rgba(255, 255, 255, 0.98),
+          0 0 50px rgba(255, 255, 255, 0.7),
+          0 0 95px rgba(0, 240, 255, 0.45),
+          0 0 130px rgba(0, 255, 157, 0.25);
+      }
+    }
+
+    .hero-cursor {
+      display: inline-block;
+      width: 4px;
+      height: 0.82em;
+      margin-left: 8px;
+      background-color: #ffffff;
+      border-radius: 2px;
+      box-shadow: 0 0 10px #ffffff, 0 0 22px rgba(0, 240, 255, 0.9);
+      animation: cursorBlink 0.9s infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 45% { opacity: 1; }
+      50%, 95% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Guns.lol Real-Time Discord Presence Widget */
+    .discord-widget-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem auto 1.25rem auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .discord-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(18, 18, 22, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 10px 18px 10px 14px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: transform 0.25s var(--ease-out), border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+      max-width: 440px;
+    }
+
+    .discord-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(255, 255, 255, 0.05);
+    }
+
+    .discord-avatar-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .discord-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: #111115;
+    }
+
+    .discord-status-dot {
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #23a55a;
+      border: 3px solid #121216;
+      transition: background-color 0.3s;
+    }
+
+    .discord-status-dot.idle { background: #f0b232; }
+    .discord-status-dot.dnd { background: #f23f43; }
+    .discord-status-dot.offline { background: #80848e; }
+    .discord-status-dot.online { background: #23a55a; }
+
+    .discord-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .discord-user-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+
+    .discord-username {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .discord-custom-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      padding: 1px 7px;
+      font-size: 0.7rem;
+      color: #d1d1d6;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .discord-activity-line {
+      font-size: 0.82rem;
+      color: #e4e4e7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+      line-height: 1.3;
+    }
+
+    .discord-activity-line strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .discord-sub-line {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+      line-height: 1.3;
+    }
+
+    .discord-album-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .discord-album-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .discord-sync-badge {
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid var(--accent-green-border);
+      color: #4ade80;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.12rem 0.45rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0d0d12;
+      border: 1px solid var(--border-hover);
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      animation: modalIn 0.25s var(--ease-out);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+    }
+
+    .modal-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .modal-input-group label {
+      font-size: 0.75rem;
+      color: #e4e4e7;
+      font-weight: 600;
+    }
+
+    .modal-input-group input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .modal-input-group input:focus {
+      border-color: #5865F2;
+    }
+
+    .modal-tip {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .modal-tip a {
+      color: #5865F2;
+      text-decoration: none;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .btn-primary {
+      background: #5865F2;
+      border: none;
+      color: #ffffff;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #4752c4;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+      font-weight: 400;
+      color: #e4e4e7;
+      max-width: 660px;
+      margin: 1.5rem auto 1rem auto;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-sub {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 2.5rem auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Minimal Stats Strip */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-bg-hover);
+      transform: translateY(-2px);
+    }
+
+    .stat-number {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Section Styling */
+    .section {
+      margin-top: 6rem;
+    }
+
+    .section-head {
+      margin-bottom: 2rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+    }
+
+    /* Projects Grid - Modern Minimal Cards */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.25s, background-color 0.25s, transform 0.25s;
+      position: relative;
+    }
+
+    .project-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-bg-hover);
+      transform: translateY(-3px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-active {
+      background: var(--accent-green-bg);
+      border: 1px solid var(--accent-green-border);
+      color: #4ade80;
+    }
+
+    .badge-active .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent-green);
+    }
+
+    .badge-closed {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .badge-closed .static-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-dim);
+      border-radius: 50%;
+    }
+
+    .card-role-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      font-size: 0.78rem;
+    }
+
+    .role-tag {
+      background: rgba(255, 255, 255, 0.04);
+      color: #d1d1d6;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .scale-tag {
+      color: var(--text-muted);
+      padding: 0.2rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Skills Layout - Balanced, Cohesive Cards */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .skill-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: border-color 0.25s, background-color 0.25s, transform 0.25s;
+    }
+
+    .skill-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-bg-hover);
+      transform: translateY(-2px);
+    }
+
+    .skill-head {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.9rem;
+    }
+
+    .skill-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+    }
+
+    .skill-caption {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .skill-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .skill-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .skill-row-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #f4f4f5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .skill-row-badge {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.12rem 0.45rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .skill-row-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pill-item {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: #d4d4d8;
+      padding: 0.28rem 0.65rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+    }
+
+    .pill-item:hover {
+      border-color: var(--border-hover);
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    /* Games Section - Sleek Competitive Cards with Logos */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.25s, background-color 0.25s, transform 0.25s;
+    }
+
+    .game-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-bg-hover);
+      transform: translateY(-2px);
+    }
+
+    .game-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .game-logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-title-group {
+      flex: 1;
+    }
+
+    .game-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .game-modes {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .game-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .game-badge.rank-badge {
+      background: rgba(255, 215, 0, 0.08);
+      border-color: rgba(255, 215, 0, 0.28);
+      color: #ffd700;
+    }
+
+    .game-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Languages Matrix */
+    .languages-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .lang-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1rem;
+      text-align: left;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .lang-item:hover {
+      border-color: var(--border-hover);
+      background: var(--card-bg-hover);
+    }
+
+    .lang-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lang-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .lang-badge {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .lang-level {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .lang-indicator {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 2px;
+      margin-top: 0.85rem;
+      overflow: hidden;
+    }
+
+    .lang-fill {
+      height: 100%;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: width 0.8s var(--ease-out);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 6rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 900px) {
+      .hero-arm--digital {
+        width: calc(-220px + 50vw);
+        height: clamp(80px, 12vw, 150px);
+        transform: translate(-12px, calc(-50% - 3px));
+      }
+      .hero-arm--human {
+        max-width: calc(-160px + 50vw);
+        height: clamp(88px, 13vw, 168px);
+        right: -35px;
+        transform: translate(-35px, calc(-50% - 20px)) scale(1.05);
+      }
+      .projects-grid,
+      .skills-grid,
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .languages-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-arm {
+        display: none;
+      }
+      .stats-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .container {
+        padding: 1.5rem 1rem 4rem 1rem;
+      }
+      .nav {
+        margin-bottom: 2rem;
+      }
+      .section {
+        margin-top: 4rem;
+      }
+      .footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Minimal Header with Language Switcher -->
+    <header class="nav">
+      <a href="#" class="nav-brand">
+        <span class="dot"></span>
+        <span>borek</span>
+      </a>
+
+      <div class="nav-right">
+        <div class="lang-switch" role="group" aria-label="Language selection">
+          <button type="button" class="lang-btn active" id="btn-en" onclick="setLanguage('en')">EN</button>
+          <button type="button" class="lang-btn" id="btn-es" onclick="setLanguage('es')">ES</button>
+        </div>
+        <div class="nav-status">
+          <span data-i18n="nav_status">Active &middot; Operating</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Clean Hero with Creation of Adam Hands and Luminous Animated Name -->
+    <section class="hero">
+      <div class="hero-pill" data-i18n-html="hero_pill">
+        <span class="hero-pill-badge">Alias Borek</span> &middot; Age 16 &middot; Spain / Georgia
+      </div>
+
+      <div class="hero-arms-stage">
+        <img src="digital-arm.png" alt="Digital Vector" class="hero-arm hero-arm--digital" decoding="async" draggable="false">
+        <div class="hero-title-wrap">
+          <h1 class="hero-title">
+            <span id="hero-typewriter">Borek</span><span class="hero-cursor"></span>
+          </h1>
+        </div>
+        <img src="human-arm.png" alt="Human Vector" class="hero-arm hero-arm--human" decoding="async" draggable="false">
+      </div>
+
+      <!-- Guns.lol Live Discord Presence Module -->
+      <div class="discord-widget-wrap">
+        <div class="discord-card" id="discordPresenceCard" onclick="openDiscordModal()" title="Click to connect Discord ID">
+          <div class="discord-avatar-wrap">
+            <img src="discord-avatar.png" alt="Discord Avatar" class="discord-avatar-img" id="discordAvatar">
+            <span class="discord-status-dot online" id="discordStatusDot"></span>
+          </div>
+          <div class="discord-info">
+            <div class="discord-user-row">
+              <span class="discord-username" id="discordUsername">c7uh</span>
+              <span class="discord-custom-status" id="discordCustomStatus">
+                <span>🍃</span><span>ϑϱ</span>
+              </span>
+            </div>
+            <div class="discord-activity-line" id="discordActivityLine">
+              <strong>Listening to</strong> <span id="discordActivityName">Solitude - Slowed</span>
+            </div>
+            <div class="discord-sub-line" id="discordActivitySub">
+              by juno, blindheart
+            </div>
+          </div>
+          <div class="discord-album-wrap" id="discordAlbumWrap">
+            <img src="spotify-album.png" alt="Album Art" class="discord-album-img" id="discordAlbumImg">
+          </div>
+          <div class="discord-sync-badge" id="discordSyncBadge">LIVE</div>
+        </div>
+      </div>
+
+      <p class="hero-tagline" data-i18n="hero_tagline">
+        Offensive Automation Specialist, OSINT Practitioner &amp; Prompt Architect.
+      </p>
+      <p class="hero-sub" data-i18n="hero_sub">
+        Designing scalable automation engines, intelligence gathering pipelines, and advanced AI steering models.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number">+800K</div>
+          <div class="stat-label" data-i18n="stat_raids">Raids Executed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">100K+</div>
+          <div class="stat-label" data-i18n="stat_reach">Community Reach</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Azure</div>
+          <div class="stat-label" data-i18n="stat_lead">Lead Platform</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">4</div>
+          <div class="stat-label" data-i18n="stat_langs">Languages</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Grid -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-subtitle" data-i18n="track_record_sub">Track Record</div>
+        <h2 class="section-title" data-i18n="track_record_title">Operations &amp; Projects</h2>
+      </div>
+
+      <div class="projects-grid">
+
+        <!-- Azure (Active) -->
+        <article class="project-card">
+          <div>
+            <div class="card-top">
+              <h3 class="card-title">Azure</h3>
+              <span class="badge badge-active">
+                <span class="pulse-dot"></span>
+                <span data-i18n="badge_active">Active</span>
+              </span>
+            </div>
+            <div class="card-role-strip">
+              <span class="role-tag" data-i18n="azure_role">Founder &amp; Lead Developer</span>
+              <span class="scale-tag" data-i18n="azure_scale">500 Members</span>
+            </div>
+            <p class="card-desc" data-i18n="azure_desc">
+              Automated streaming service architecture, custom credential generation pipeline, and community reward distribution engines.
+            </p>
+          </div>
+        </article>
+
+        <!-- Dead Destroyers -->
+        <article class="project-card">
+          <div>
+            <div class="card-top">
+              <h3 class="card-title">Dead Destroyers</h3>
+              <span class="badge badge-closed">
+                <span class="static-dot"></span>
+                <span data-i18n="badge_closed">Closed</span>
+              </span>
+            </div>
+            <div class="card-role-strip">
+              <span class="role-tag" data-i18n="dead_role">System Administrator</span>
+              <span class="scale-tag" data-i18n="dead_scale">44,000 Members &middot; +500K Raids</span>
+            </div>
+            <p class="card-desc" data-i18n="dead_desc">
+              Mass raid automation network and bot infrastructure. Handled distributed coordination, high socket concurrency, and server dispatch topologies.
+            </p>
+          </div>
+        </article>
+
+        <!-- Fast Destroyers -->
+        <article class="project-card">
+          <div>
+            <div class="card-top">
+              <h3 class="card-title">Fast Destroyers</h3>
+              <span class="badge badge-closed">
+                <span class="static-dot"></span>
+                <span data-i18n="badge_closed">Closed</span>
+              </span>
+            </div>
+            <div class="card-role-strip">
+              <span class="role-tag" data-i18n="fast_role">Operations &amp; Infra Management</span>
+              <span class="scale-tag" data-i18n="fast_scale">36,000 Members &middot; +300K Raids</span>
+            </div>
+            <p class="card-desc" data-i18n="fast_desc">
+              High-velocity raid execution network. Managed low-latency dispatch routines, anti-abuse mitigation bypasses, and thread pool scaling.
+            </p>
+          </div>
+        </article>
+
+        <!-- EsqueleSquad -->
+        <article class="project-card">
+          <div>
+            <div class="card-top">
+              <h3 class="card-title">EsqueleSquad</h3>
+              <span class="badge badge-closed">
+                <span class="static-dot"></span>
+                <span data-i18n="badge_closed">Closed</span>
+              </span>
+            </div>
+            <div class="card-role-strip">
+              <span class="role-tag" data-i18n="esquele_role">Core Member &middot; Threat Specialist</span>
+              <span class="scale-tag" data-i18n="esquele_scale">20,000 Members</span>
+            </div>
+            <p class="card-desc" data-i18n="esquele_desc">
+              Cyber threat and offensive collective operations. Conducted adversary simulation, vulnerability research, and distributed tooling.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Technical Stack - Clean, Balanced Architecture -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-subtitle" data-i18n="tech_sub">Capabilities</div>
+        <h2 class="section-title" data-i18n="tech_title">Technical Stack</h2>
+      </div>
+
+      <div class="skills-grid">
+
+        <!-- Core Languages -->
+        <div class="skill-card">
+          <div class="skill-head">
+            <h3 class="skill-title" data-i18n="core_lang_title">Core Languages</h3>
+            <p class="skill-caption" data-i18n="core_lang_sub">High-throughput development runtimes</p>
+          </div>
+
+          <div class="skill-items-list">
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span>Python</span>
+                <span class="skill-row-badge">Primary</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="python_desc">Automation, high-concurrency AsyncIO pipelines, distributed scraping engines.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span>C++</span>
+                <span class="skill-row-badge">Native</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="cpp_desc">Low-level memory routines, high-speed socket streams, native binary concurrency.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span>Java</span>
+                <span class="skill-row-badge">Backend</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="java_desc">Multi-threaded network daemons, robust socket handlers, enterprise infrastructure.</p>
+            </div>
+          </div>
+
+          <div class="pill-list">
+            <span class="pill-item">AsyncIO</span>
+            <span class="pill-item">Socket Programming</span>
+            <span class="pill-item">Process Pools</span>
+          </div>
+        </div>
+
+        <!-- Intelligence & Security -->
+        <div class="skill-card">
+          <div class="skill-head">
+            <h3 class="skill-title" data-i18n="sec_title">Security &amp; OSINT</h3>
+            <p class="skill-caption" data-i18n="sec_sub">Offensive operations &amp; forensics</p>
+          </div>
+
+          <div class="skill-items-list">
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_cred">Credential Pipelines</span>
+                <span class="skill-row-badge">Offensive</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="cred_desc">Custom cracking engines, token generators, and distributed auth verification.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_db">Database Extraction</span>
+                <span class="skill-row-badge">Intelligence</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="db_desc">Targeted indexing, penetration analysis, leak verification, and structured parsing.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_osint">OSINT Reconnaissance</span>
+                <span class="skill-row-badge">Recon</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="osint_desc">Deep digital forensics, public breach mapping, entity tracking, proxy tunneling.</p>
+            </div>
+          </div>
+
+          <div class="pill-list">
+            <span class="pill-item" data-i18n="pill_cracking">Cracking Engines</span>
+            <span class="pill-item" data-i18n="pill_pentest">Penetration Testing</span>
+            <span class="pill-item" data-i18n="pill_forensics">Digital Forensics</span>
+          </div>
+        </div>
+
+        <!-- AI Architecture -->
+        <div class="skill-card">
+          <div class="skill-head">
+            <h3 class="skill-title" data-i18n="ai_title">AI Architecture</h3>
+            <p class="skill-caption" data-i18n="ai_sub">Prompt engineering &amp; model steering</p>
+          </div>
+
+          <div class="skill-items-list">
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_prompt">Prompt Engineering</span>
+                <span class="skill-row-badge">Steering</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="prompt_desc">High-leverage architectural prompts, precise reasoning steering, role emulation.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_harden">System Prompt Hardening</span>
+                <span class="skill-row-badge">Security</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="harden_desc">Jailbreak mitigation bypass analysis, guardrail testing, behavioral control bounds.</p>
+            </div>
+
+            <div class="skill-row">
+              <div class="skill-row-title">
+                <span data-i18n="tag_context">Context Optimization</span>
+                <span class="skill-row-badge">Efficiency</span>
+              </div>
+              <p class="skill-row-desc" data-i18n="context_desc">Token efficiency modeling, needle-in-haystack context recall, agent chaining.</p>
+            </div>
+          </div>
+
+          <div class="pill-list">
+            <span class="pill-item" data-i18n="pill_behavioral">Behavioral Steering</span>
+            <span class="pill-item" data-i18n="pill_evals">LLM Evals</span>
+            <span class="pill-item" data-i18n="pill_chaining">Agent Chaining</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Gaming Section (Between Tech Stack & Languages) -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-subtitle" data-i18n="games_sub">Competition &amp; Gaming</div>
+        <h2 class="section-title" data-i18n="games_title">Games</h2>
+      </div>
+
+      <div class="games-grid">
+
+        <!-- Roblox Card -->
+        <article class="game-card">
+          <div>
+            <div class="game-header">
+              <div class="game-logo-box" aria-label="Roblox Logo">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5.164 0L0 18.836l18.836 5.164L24 5.164 5.164 0zm9.4 13.963l-4.527-1.241 1.241-4.527 4.527 1.241-1.241 4.527z"/>
+                </svg>
+              </div>
+              <div class="game-title-group">
+                <h3 class="game-name">Roblox</h3>
+                <div class="game-modes" data-i18n="roblox_modes">Duels &middot; Rivals &middot; +150k ELO</div>
+              </div>
+              <span class="game-badge rank-badge" data-i18n="roblox_badge">Top 2 Spain</span>
+            </div>
+            <p class="game-desc" data-i18n="roblox_desc">
+              Top 2 in Spain for Duels, competitive +150k ELO, former top 47 streak in Rivals. Specialist in advanced movement mechanics and precision.
+            </p>
+          </div>
+          <div class="pill-list">
+            <span class="pill-item" data-i18n="pill_top2">Top 2 Spain</span>
+            <span class="pill-item">+150k ELO</span>
+            <span class="pill-item" data-i18n="pill_streak">Ex Top 47 Streak</span>
+            <span class="pill-item">Rivals</span>
+            <span class="pill-item" data-i18n="pill_duels">Duels</span>
+          </div>
+        </article>
+
+        <!-- Minecraft Card -->
+        <article class="game-card">
+          <div>
+            <div class="game-header">
+              <div class="game-logo-box" aria-label="Minecraft Logo" style="background: rgba(79, 168, 61, 0.12); border-color: rgba(79, 168, 61, 0.3);">
+                <svg width="28" height="28" viewBox="0 0 24 24">
+                  <rect width="24" height="24" rx="4" fill="#4fa83d"/>
+                  <path d="M3 3h6v6H3V3zm12 0h6v6h-6V3zm-12 9h6V9h6v3h6v9h-6v-3H9v3H3v-9z" fill="#142610"/>
+                </svg>
+              </div>
+              <div class="game-title-group">
+                <h3 class="game-name">Minecraft</h3>
+                <div class="game-modes" data-i18n="mc_modes">Competitive PvP</div>
+              </div>
+              <span class="game-badge" data-i18n="mc_badge">PvP &middot; Mechanics</span>
+            </div>
+            <p class="game-desc" data-i18n="mc_desc">
+              Advanced PvP combat mechanics, sprint-reset timing, weapon discipline, and technical movement systems.
+            </p>
+          </div>
+          <div class="pill-list">
+            <span class="pill-item">PvP Mechanics</span>
+            <span class="pill-item">Sprint Reset</span>
+            <span class="pill-item">Combo Disciplines</span>
+            <span class="pill-item">Hit Timing</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Languages Matrix - Reordered by Actual Fluency -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-subtitle" data-i18n="lang_sub">Communication</div>
+        <h2 class="section-title" data-i18n="lang_title">Languages</h2>
+      </div>
+
+      <div class="languages-grid">
+
+        <!-- 1. Spanish (Native / 100%) -->
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name" data-i18n="lang_esp_name">Spanish</div>
+            <div class="lang-badge">ESP</div>
+          </div>
+          <div class="lang-level" data-i18n="lang_esp_level">Native &middot; 100%</div>
+          <div class="lang-indicator">
+            <div class="lang-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- 2. Georgian (Fluent / 95%) -->
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name" data-i18n="lang_geo_name">Georgian</div>
+            <div class="lang-badge">GEO</div>
+          </div>
+          <div class="lang-level" data-i18n="lang_geo_level">Fluent &middot; 95%</div>
+          <div class="lang-indicator">
+            <div class="lang-fill" style="width: 95%;"></div>
+          </div>
+        </div>
+
+        <!-- 3. English (Professional / 85%) -->
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name" data-i18n="lang_eng_name">English</div>
+            <div class="lang-badge">ENG</div>
+          </div>
+          <div class="lang-level" data-i18n="lang_eng_level">Professional &middot; 85%</div>
+          <div class="lang-indicator">
+            <div class="lang-fill" style="width: 85%;"></div>
+          </div>
+        </div>
+
+        <!-- 4. Russian (Working / 70%) -->
+        <div class="lang-item">
+          <div class="lang-top">
+            <div class="lang-name" data-i18n="lang_rus_name">Russian</div>
+            <div class="lang-badge">RUS</div>
+          </div>
+          <div class="lang-level" data-i18n="lang_rus_level">Conversational &middot; 70%</div>
+          <div class="lang-indicator">
+            <div class="lang-fill" style="width: 70%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Minimal Modern Footer -->
+    <footer class="footer">
+      <div data-i18n="footer_copy">&copy; 2026 Borek &middot; Offensive Automation &amp; OSINT</div>
+      <div data-i18n="footer_sub">Designed with pure minimalist standards</div>
+    </footer>
+
+  </div>
+
+  <script>
+    /* Luminous Typewriter Effect for Hero Name */
+    (function initGlowingTypewriter() {
+      const el = document.getElementById('hero-typewriter');
+      if (!el) return;
+
+      const targetWord = "Borek";
+      let isDeleting = false;
+      let charIdx = targetWord.length;
+      const typeDelay = 150;
+      const deleteDelay = 90;
+      const visibleHold = 3600;
+      const emptyHold = 550;
+
+      function step() {
+        if (!isDeleting) {
+          charIdx++;
+          el.textContent = targetWord.substring(0, charIdx);
+
+          if (charIdx === targetWord.length) {
+            isDeleting = true;
+            setTimeout(step, visibleHold);
+            return;
+          }
+          setTimeout(step, typeDelay + Math.random() * 45);
+        } else {
+          charIdx--;
+          el.textContent = targetWord.substring(0, charIdx);
+
+          if (charIdx === 0) {
+            isDeleting = false;
+            setTimeout(step, emptyHold);
+            return;
+          }
+          setTimeout(step, deleteDelay);
+        }
+      }
+
+      // Initial cycle starts after viewing the full glowing title
+      setTimeout(() => {
+        isDeleting = true;
+        step();
+      }, visibleHold);
+    })();
+
+    const translations = {
+      en: {
+        nav_status: "Active · Operating",
+        hero_pill: '<span class="hero-pill-badge">Alias Borek</span> &middot; Age 16 &middot; Spain / Georgia',
+        hero_tagline: "Offensive Automation Specialist, OSINT Practitioner & Prompt Architect.",
+        hero_sub: "Designing scalable automation engines, intelligence gathering pipelines, and advanced AI steering models.",
+        stat_raids: "Raids Executed",
+        stat_reach: "Community Reach",
+        stat_lead: "Lead Platform",
+        stat_langs: "Languages",
+        track_record_sub: "Track Record",
+        track_record_title: "Operations & Projects",
+        badge_active: "Active",
+        badge_closed: "Closed",
+        azure_role: "Founder & Lead Developer",
+        azure_scale: "500 Members",
+        azure_desc: "Automated streaming service architecture, custom credential generation pipeline, and community reward distribution engines.",
+        dead_role: "System Administrator",
+        dead_scale: "44,000 Members · +500K Raids",
+        dead_desc: "Mass raid automation network and bot infrastructure. Handled distributed coordination, high socket concurrency, and server dispatch topologies.",
+        fast_role: "Operations & Infra Management",
+        fast_scale: "36,000 Members · +300K Raids",
+        fast_desc: "High-velocity raid execution network. Managed low-latency dispatch routines, anti-abuse mitigation bypasses, and thread pool scaling.",
+        esquele_role: "Core Member · Threat Specialist",
+        esquele_scale: "20,000 Members",
+        esquele_desc: "Cyber threat and offensive collective operations. Conducted adversary simulation, vulnerability research, and distributed tooling.",
+        tech_sub: "Capabilities",
+        tech_title: "Technical Stack",
+        core_lang_title: "Core Languages",
+        core_lang_sub: "High-throughput development runtimes",
+        python_desc: "Automation, high-concurrency AsyncIO pipelines, distributed scraping engines.",
+        cpp_desc: "Low-level memory routines, high-speed socket streams, native binary concurrency.",
+        java_desc: "Multi-threaded network daemons, robust socket handlers, enterprise infrastructure.",
+        sec_title: "Security & OSINT",
+        sec_sub: "Offensive operations & forensics",
+        tag_cred: "Credential Pipelines",
+        cred_desc: "Custom cracking engines, token generators, and distributed auth verification.",
+        tag_db: "Database Extraction",
+        db_desc: "Targeted indexing, penetration analysis, leak verification, and structured parsing.",
+        tag_osint: "OSINT Reconnaissance",
+        osint_desc: "Deep digital forensics, public breach mapping, entity tracking, proxy tunneling.",
+        pill_cracking: "Cracking Engines",
+        pill_pentest: "Penetration Testing",
+        pill_forensics: "Digital Forensics",
+        ai_title: "AI Architecture",
+        ai_sub: "Prompt engineering & model steering",
+        tag_prompt: "Prompt Engineering",
+        prompt_desc: "High-leverage architectural prompts, precise reasoning steering, role emulation.",
+        tag_harden: "System Prompt Hardening",
+        harden_desc: "Jailbreak mitigation bypass analysis, guardrail testing, behavioral control bounds.",
+        tag_context: "Context Optimization",
+        context_desc: "Token efficiency modeling, needle-in-haystack context recall, agent chaining.",
+        pill_behavioral: "Behavioral Steering",
+        pill_evals: "LLM Evals",
+        pill_chaining: "Agent Chaining",
+        games_sub: "Competition & Gaming",
+        games_title: "Games",
+        roblox_badge: "Top 2 Spain",
+        roblox_modes: "Duels · Rivals · +150k ELO",
+        roblox_desc: "Top 2 in Spain for Duels, competitive +150k ELO, former top 47 streak in Rivals. Specialist in advanced movement mechanics and precision.",
+        pill_top2: "Top 2 Spain",
+        pill_streak: "Ex Top 47 Streak",
+        pill_duels: "Duels",
+        mc_badge: "PvP & Technical",
+        mc_modes: "Competitive PvP",
+        mc_desc: "Advanced PvP combat mechanics, sprint-reset timing, weapon discipline, and technical movement systems.",
+        lang_sub: "Communication",
+        lang_title: "Languages",
+        lang_esp_name: "Spanish",
+        lang_esp_level: "Native · 100%",
+        lang_geo_name: "Georgian",
+        lang_geo_level: "Fluent · 95%",
+        lang_eng_name: "English",
+        lang_eng_level: "Professional · 85%",
+        lang_rus_name: "Russian",
+        lang_rus_level: "Conversational · 70%",
+        footer_copy: "© 2026 Borek · Offensive Automation & OSINT",
+        footer_sub: "Designed with pure minimalist standards",
+        modal_discord_title: "Discord Presence Sync",
+        modal_discord_desc: "Link your Discord Snowflake ID to stream real-time status, activity, and Spotify playback using Lanyard.",
+        modal_discord_label: "Discord User ID (Snowflake)",
+        modal_discord_tip: "Tip: Enable Developer Mode in Discord, right-click your profile and select 'Copy User ID'. You must be in the Lanyard Discord server (<a href=\"https://discord.gg/lanyard\" target=\"_blank\" rel=\"noopener\" style=\"color:#5865F2;text-decoration:underline;\">discord.gg/lanyard</a>) to enable live presence.",
+        modal_btn_reset: "Reset to Default",
+        modal_btn_save: "Save & Connect"
+      },
+      es: {
+        nav_status: "Activo · Operando",
+        hero_pill: '<span class="hero-pill-badge">Alias Borek</span> &middot; 16 años &middot; España / Georgia',
+        hero_tagline: "Especialista en Automatización Ofensiva, OSINT y Arquitecto de Prompts.",
+        hero_sub: "Diseño de motores de automatización escalables, pipelines de recolección de inteligencia y modelos avanzados de steering para IA.",
+        stat_raids: "Raids Ejecutados",
+        stat_reach: "Alcance Comunitario",
+        stat_lead: "Plataforma Principal",
+        stat_langs: "Idiomas",
+        track_record_sub: "Historial",
+        track_record_title: "Operaciones y Proyectos",
+        badge_active: "Activo",
+        badge_closed: "Cerrado",
+        azure_role: "Fundador y Desarrollador Principal",
+        azure_scale: "500 Miembros",
+        azure_desc: "Arquitectura de streaming automatizada, pipeline propio de generación de credenciales y motores de distribución de recompensas.",
+        dead_role: "Administrador de Sistemas",
+        dead_scale: "44.000 Miembros · +500K Raids",
+        dead_desc: "Red masiva de automatización de raids e infraestructura de bots. Gestión de coordinación distribuida, alta concurrencia de sockets y topologías de despacho.",
+        fast_role: "Operaciones y Gestión de Infraestructura",
+        fast_scale: "36.000 Miembros · +300K Raids",
+        fast_desc: "Red de ejecución de raids de alta velocidad. Rutinas de despacho de baja latencia, bypass de mitigaciones anti-abuso y escalado de pools de hilos.",
+        esquele_role: "Miembro Core · Especialista en Amenazas",
+        esquele_scale: "20.000 Miembros",
+        esquele_desc: "Operaciones de colectivo ofensivo y ciberamenazas. Simulación de adversarios, investigación de vulnerabilidades y herramientas distribuidas.",
+        tech_sub: "Capacidades",
+        tech_title: "Stack Técnico",
+        core_lang_title: "Lenguajes Principales",
+        core_lang_sub: "Entornos de desarrollo de alto rendimiento",
+        python_desc: "Automatización, pipelines AsyncIO de alta concurrencia, motores de scraping distribuido.",
+        cpp_desc: "Rutinas de memoria a bajo nivel, streams de sockets de alta velocidad, concurrencia binaria nativa.",
+        java_desc: "Daemons de red multihilo, manejadores robustos de sockets, infraestructura empresarial.",
+        sec_title: "Seguridad y OSINT",
+        sec_sub: "Infraestructura ofensiva e inteligencia",
+        tag_cred: "Pipelines de Credenciales",
+        cred_desc: "Motores propios de cracking, generadores de tokens y verificación de auth distribuida.",
+        tag_db: "Extracción de Bases de Datos",
+        db_desc: "Indexación dirigida, análisis de penetración, verificación de filtraciones y parsing estructurado.",
+        tag_osint: "Reconocimiento OSINT",
+        osint_desc: "Forense digital profundo, mapeo de filtraciones públicas, rastreo de entidades, túneles proxy.",
+        pill_cracking: "Motores de Cracking",
+        pill_pentest: "Test de Penetración",
+        pill_forensics: "Análisis Forense Digital",
+        ai_title: "Arquitectura de IA",
+        ai_sub: "Ingeniería de prompts y dirección de modelos",
+        tag_prompt: "Ingeniería de Prompts",
+        prompt_desc: "Prompts arquitectónicos de alto impacto, dirección de razonamiento preciso, emulación de roles.",
+        tag_harden: "Blindaje de System Prompts",
+        harden_desc: "Bypass de mitigaciones de jailbreak, testing de guardrails, límites de control de comportamiento.",
+        tag_context: "Optimización de Contexto",
+        context_desc: "Modelado de eficiencia de tokens, recuperación tipo aguja en pajar, encadenamiento de agentes.",
+        pill_behavioral: "Steering Conductual",
+        pill_evals: "Evaluaciones de LLM",
+        pill_chaining: "Encadenamiento de Agentes",
+        games_sub: "Competición y Ocio",
+        games_title: "Juegos",
+        roblox_badge: "Top 2 España",
+        roblox_modes: "Duelos · Rivals · +150k ELO",
+        roblox_desc: "Top 2 en duelos España, competitivo +150k ELO, ex top 47 streak en Rivals. Especialista en mecánicas avanzadas de movimiento y precisión.",
+        pill_top2: "Top 2 España",
+        pill_streak: "Ex Top 47 Streak",
+        pill_duels: "Duelos",
+        mc_badge: "PvP y Técnico",
+        mc_modes: "PvP Competitivo",
+        mc_desc: "Mecánicas avanzadas de combate PvP, timing de sprint-reset, disciplina de combos y sistemas técnicos de movimiento.",
+        lang_sub: "Comunicación",
+        lang_title: "Idiomas",
+        lang_esp_name: "Español",
+        lang_esp_level: "Nativo · 100%",
+        lang_geo_name: "Georgiano",
+        lang_geo_level: "Fluido · 95%",
+        lang_eng_name: "Inglés",
+        lang_eng_level: "Profesional · 85%",
+        lang_rus_name: "Ruso",
+        lang_rus_level: "Conversacional · 70%",
+        footer_copy: "© 2026 Borek · Automatización Ofensiva y OSINT",
+        footer_sub: "Diseñado con estándares puramente minimalistas",
+        modal_discord_title: "Sincronización de Discord",
+        modal_discord_desc: "Vincula tu Snowflake ID de Discord para transmitir tu estado en vivo, actividad y Spotify en tiempo real con Lanyard.",
+        modal_discord_label: "ID de Usuario de Discord (Snowflake)",
+        modal_discord_tip: "Tip: Activa el Modo Desarrollador en Discord, clic derecho en tu perfil y 'Copiar ID de usuario'. Debes estar en el servidor de Lanyard (<a href=\"https://discord.gg/lanyard\" target=\"_blank\" rel=\"noopener\" style=\"color:#5865F2;text-decoration:underline;\">discord.gg/lanyard</a>) para activar el estado en tiempo real.",
+        modal_btn_reset: "Restablecer por defecto",
+        modal_btn_save: "Guardar y Conectar"
+      }
+    };
+
+    function setLanguage(lang) {
+      const data = translations[lang] || translations.en;
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (data[key]) el.textContent = data[key];
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (data[key]) el.innerHTML = data[key];
+      });
+
+      const btnEn = document.getElementById('btn-en');
+      const btnEs = document.getElementById('btn-es');
+      if (btnEn && btnEs) {
+        btnEn.classList.toggle('active', lang === 'en');
+        btnEs.classList.toggle('active', lang === 'es');
+      }
+
+      localStorage.setItem('borek_portfolio_lang', lang);
+    }
+
+    // Auto-detect or restore preferred language
+    (function initLanguage() {
+      const saved = localStorage.getItem('borek_portfolio_lang');
+      const browserPref = navigator.language && navigator.language.startsWith('es') ? 'es' : 'en';
+      setLanguage(saved || browserPref);
+    })();
+
+    /* ========================================================
+       DISCORD LIVE PRESENCE (LANYARD INTEGRATION)
+       ======================================================== */
+    const BOREK_DISCORD_ID = "1447274415246020609";
+    const DEFAULT_DISCORD = {
+      id: BOREK_DISCORD_ID,
+      username: "c7uh",
+      avatar: "discord-avatar.png",
+      status: "online",
+      customStatusEmoji: "🍃",
+      customStatusText: "ϑϱ",
+      activityType: "Listening to",
+      activityName: "Solitude - Slowed",
+      activitySub: "by juno, blindheart",
+      albumArt: "spotify-album.png"
+    };
+
+    let lanyardSocket = null;
+    let heartbeatInterval = null;
+
+    function getSavedDiscordId() {
+      return localStorage.getItem('borek_discord_id') || BOREK_DISCORD_ID;
+    }
+
+    function openDiscordModal() {
+      const modal = document.getElementById('discordModal');
+      const input = document.getElementById('discordIdInput');
+      if (input) input.value = getSavedDiscordId();
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeDiscordModal() {
+      const modal = document.getElementById('discordModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function handleDiscordModalOverlay(e) {
+      if (e.target && e.target.id === 'discordModal') {
+        closeDiscordModal();
+      }
+    }
+
+    function saveDiscordId() {
+      const input = document.getElementById('discordIdInput');
+      const rawVal = input ? input.value.trim() : '';
+      if (!rawVal) {
+        resetDefaultDiscord();
+        return;
+      }
+      localStorage.setItem('borek_discord_id', rawVal);
+      closeDiscordModal();
+      initDiscordPresence();
+    }
+
+    function resetDefaultDiscord() {
+      localStorage.setItem('borek_discord_id', BOREK_DISCORD_ID);
+      const input = document.getElementById('discordIdInput');
+      if (input) input.value = BOREK_DISCORD_ID;
+      closeDiscordModal();
+      initDiscordPresence();
+    }
+
+    function applyDefaultDiscord() {
+      if (lanyardSocket) {
+        try { lanyardSocket.close(); } catch (_) {}
+        lanyardSocket = null;
+      }
+      if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+      }
+
+      const uEl = document.getElementById('discordUsername');
+      if (uEl) uEl.textContent = DEFAULT_DISCORD.username;
+      
+      const avEl = document.getElementById('discordAvatar');
+      if (avEl) avEl.src = DEFAULT_DISCORD.avatar;
+      
+      const dot = document.getElementById('discordStatusDot');
+      if (dot) dot.className = 'discord-status-dot ' + DEFAULT_DISCORD.status;
+
+      const cs = document.getElementById('discordCustomStatus');
+      if (cs) {
+        cs.innerHTML = `<span>${DEFAULT_DISCORD.customStatusEmoji}</span><span>${DEFAULT_DISCORD.customStatusText}</span>`;
+        cs.style.display = 'inline-flex';
+      }
+
+      const line = document.getElementById('discordActivityLine');
+      if (line) {
+        line.innerHTML = `<strong>${DEFAULT_DISCORD.activityType}</strong> <span id="discordActivityName">${DEFAULT_DISCORD.activityName}</span>`;
+      }
+
+      const sub = document.getElementById('discordActivitySub');
+      if (sub) {
+        sub.textContent = DEFAULT_DISCORD.activitySub;
+        sub.style.display = 'block';
+      }
+
+      const album = document.getElementById('discordAlbumWrap');
+      const albumImg = document.getElementById('discordAlbumImg');
+      if (albumImg) albumImg.src = DEFAULT_DISCORD.albumArt;
+      if (album) album.style.display = 'block';
+
+      const badge = document.getElementById('discordSyncBadge');
+      if (badge) {
+        badge.textContent = 'DISCORD';
+        badge.classList.remove('active');
+      }
+    }
+
+    function applyLanyardData(d) {
+      if (!d) return;
+
+      const badge = document.getElementById('discordSyncBadge');
+      if (badge) {
+        badge.textContent = 'LIVE';
+        badge.classList.add('active');
+      }
+
+      // Username & Avatar
+      const uEl = document.getElementById('discordUsername');
+      if (uEl && d.discord_user) {
+        uEl.textContent = d.discord_user.global_name || d.discord_user.username;
+        
+        if (d.discord_user.avatar) {
+          const ext = d.discord_user.avatar.startsWith('a_') ? 'gif' : 'png';
+          document.getElementById('discordAvatar').src = `https://cdn.discordapp.com/avatars/${d.discord_user.id}/${d.discord_user.avatar}.${ext}?size=128`;
+        }
+      }
+
+      // Status
+      const dot = document.getElementById('discordStatusDot');
+      const discordStatus = d.discord_status || 'offline';
+      if (dot) dot.className = `discord-status-dot ${discordStatus}`;
+
+      // Custom Status (activity type 4)
+      const customActivity = (d.activities || []).find(a => a.type === 4);
+      const csEl = document.getElementById('discordCustomStatus');
+      if (csEl) {
+        if (customActivity && (customActivity.state || customActivity.emoji)) {
+          let emojiHtml = '';
+          if (customActivity.emoji) {
+            if (customActivity.emoji.id) {
+              const ext = customActivity.emoji.animated ? 'gif' : 'png';
+              emojiHtml = `<img src="https://cdn.discordapp.com/emojis/${customActivity.emoji.id}.${ext}" alt="" style="width:14px;height:14px;vertical-align:middle;margin-right:2px;">`;
+            } else if (customActivity.emoji.name) {
+              emojiHtml = `<span>${customActivity.emoji.name}</span>`;
+            }
+          }
+          const stateText = customActivity.state ? `<span>${customActivity.state}</span>` : '';
+          csEl.innerHTML = emojiHtml + stateText;
+          csEl.style.display = 'inline-flex';
+        } else {
+          csEl.style.display = 'none';
+        }
+      }
+
+      // Spotify or Activity
+      const actLine = document.getElementById('discordActivityLine');
+      const actSub = document.getElementById('discordActivitySub');
+      const albumWrap = document.getElementById('discordAlbumWrap');
+      const albumImg = document.getElementById('discordAlbumImg');
+
+      if (d.listening_to_spotify && d.spotify) {
+        if (actLine) actLine.innerHTML = `<strong>Listening to</strong> <span>${d.spotify.song}</span>`;
+        if (actSub) {
+          actSub.textContent = `by ${d.spotify.artist}`;
+          actSub.style.display = 'block';
+        }
+        if (d.spotify.album_art_url && albumImg && albumWrap) {
+          albumImg.src = d.spotify.album_art_url;
+          albumWrap.style.display = 'block';
+        } else if (albumWrap) {
+          albumWrap.style.display = 'none';
+        }
+      } else {
+        const regularActivity = (d.activities || []).find(a => a.type !== 4);
+        if (regularActivity) {
+          const typeNames = { 0: 'Playing', 1: 'Streaming', 2: 'Listening to', 3: 'Watching', 5: 'Competing in' };
+          const prefix = typeNames[regularActivity.type] || 'Playing';
+          if (actLine) actLine.innerHTML = `<strong>${prefix}</strong> <span>${regularActivity.name}</span>`;
+          if (actSub) {
+            if (regularActivity.details || regularActivity.state) {
+              actSub.textContent = [regularActivity.details, regularActivity.state].filter(Boolean).join(' · ');
+              actSub.style.display = 'block';
+            } else {
+              actSub.style.display = 'none';
+            }
+          }
+
+          if (regularActivity.assets && regularActivity.assets.large_image && albumImg && albumWrap) {
+            let imgUrl = '';
+            if (regularActivity.assets.large_image.startsWith('mp:')) {
+              imgUrl = 'https://media.discordapp.net/' + regularActivity.assets.large_image.replace(/^mp:/, '');
+            } else {
+              imgUrl = `https://cdn.discordapp.com/app-assets/${regularActivity.application_id}/${regularActivity.assets.large_image}.png`;
+            }
+            albumImg.src = imgUrl;
+            albumWrap.style.display = 'block';
+          } else if (albumWrap) {
+            albumWrap.style.display = 'none';
+          }
+        } else {
+          if (actLine) actLine.innerHTML = `<span>Status:</span> <strong style="text-transform:capitalize;">${discordStatus}</strong>`;
+          if (actSub) actSub.style.display = 'none';
+          if (albumWrap) albumWrap.style.display = 'none';
+        }
+      }
+    }
+
+    function initDiscordPresence() {
+      const discordId = getSavedDiscordId();
+      if (!discordId) {
+        applyDefaultDiscord();
+        return;
+      }
+
+      // Fetch snapshot via REST
+      fetch(`https://api.lanyard.rest/v1/users/${discordId}`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.success && res.data) {
+            applyLanyardData(res.data);
+          } else {
+            applyDefaultDiscord();
+          }
+        })
+        .catch(() => {
+          applyDefaultDiscord();
+        });
+
+      // Connect WebSocket for real-time streaming
+      if (lanyardSocket) {
+        try { lanyardSocket.close(); } catch (_) {}
+      }
+      if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+      }
+
+      try {
+        lanyardSocket = new WebSocket('wss://api.lanyard.rest/socket');
+        lanyardSocket.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            const { op, d, t } = msg;
+
+            if (op === 1) { // Hello
+              const hb = d.heartbeat_interval;
+              heartbeatInterval = setInterval(() => {
+                if (lanyardSocket && lanyardSocket.readyState === WebSocket.OPEN) {
+                  lanyardSocket.send(JSON.stringify({ op: 3 }));
+                }
+              }, hb);
+
+              // Subscribe to user
+              lanyardSocket.send(JSON.stringify({
+                op: 2,
+                d: { subscribe_to_id: discordId }
+              }));
+            } else if (op === 0) { // Event
+              if (t === 'INIT_STATE' || t === 'PRESENCE_UPDATE') {
+                applyLanyardData(d);
+              }
+            }
+          } catch (err) {
+            console.error('Lanyard WS parse error:', err);
+          }
+        };
+
+        lanyardSocket.onerror = () => {
+          applyDefaultDiscord();
+        };
+
+        lanyardSocket.onclose = () => {
+          if (heartbeatInterval) clearInterval(heartbeatInterval);
+        };
+      } catch (err) {
+        console.error('Lanyard socket error:', err);
+        applyDefaultDiscord();
+      }
+    }
+
+    // Initialize presence on load
+    initDiscordPresence();
+  </script>
+
+  <!-- Discord Connection Modal -->
+  <div class="modal-overlay" id="discordModal" onclick="handleDiscordModalOverlay(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="modal_discord_title">Discord Presence Sync</h3>
+        <button type="button" class="modal-close" onclick="closeDiscordModal()">&times;</button>
+      </div>
+      <p class="modal-desc" data-i18n="modal_discord_desc">
+        Link your Discord Snowflake ID to stream real-time status, activity, and Spotify playback using Lanyard.
+      </p>
+      <div class="modal-input-group">
+        <label for="discordIdInput" data-i18n="modal_discord_label">Discord User ID (Snowflake)</label>
+        <input type="text" id="discordIdInput" value="1447274415246020609" placeholder="1447274415246020609" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="modal-tip" data-i18n-html="modal_discord_tip">
+        Tip: Enable Developer Mode in Discord, right-click your profile and select &apos;Copy User ID&apos;. You must be in the Lanyard Discord server (<a href="https://discord.gg/lanyard" target="_blank" rel="noopener" style="color:#5865F2;text-decoration:underline;">discord.gg/lanyard</a>) to enable live presence.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="resetDefaultDiscord()" data-i18n="modal_btn_reset">Reset to Default</button>
+        <button type="button" class="btn-primary" onclick="saveDiscordId()" data-i18n="modal_btn_save">Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
